@@ -4,27 +4,27 @@ slug: latency-compensation
 date: 0007/01/02
 number: 7.5
 sidebar: true
-contents: Understand latency compensation.|Slow your app down and see what's going on.|Learn how Meteor Methods call each other.
+contents: Vei intelege ce insemna latency compensation.|Vom incetini aplicatia ca sa vedem ce se intampla in culise.|Vom afla cum se apeleaza metodele Meteor intre ele.
 paragraphs: 28
 ---
 
-////
+În ultimul capitol, am introdus un concept nou din lumea meteor: **Metodele**.
 
-<%= diagram "latency1", "Without latency compensation", "pull-right" %>
+<%= diagram "latency1", "Fără latency compensation.", "pull-right" %>
 
-////
+O Metodă Meteor este o modalitate de execuție a unei serii de comenzi pe server într-un mod structurat. În exemplul nostru, am folosit o metodă Meteor deoarece aveam nevoie să fim siguri că postările noi au atașate pe ele numele autorului cât și timpul de pe server.
 
-////
+Dar, dacă Meteor ar fi executat Metodele în cel mai simplu mod posibil, am avea o problemă. Să considerăm următoarea secvență de evenimente (atenție: timpii sunt aleatorii și au scop ilustrativ):
 
-- *+0ms:* ////
-- *+200ms:* ////
-- *+500ms:* ////
+- *+0ms:* Utilizatorul apasă pe un buton de submit șî browserul apelează o metodă.
+- *+200ms:* Serverul face schimbări bazei de date Mongo.
+- *+500ms:* Clientul primește aceste schimbări, și schimbă interfața ca să reflecte schimbările.
 
-If this were the way Meteor operated, then there'd be a short lag between performing such actions and seeing the results (that lag being more or less noticeable depending on how close you were to the server). We can't have that in a modern web application!
+Dacă asta ar fi fost modul în care Meteor operează, atunci ar fi o întârziere între momentul efectuării unei asemenea acțiuni si vizualizarea rezultatelor (întârzierea fiind mai mult sau mai puțin pronunțată în funcție de distanța utilizatorului față de server). Nu ne permitem să avem așa ceva într-o aplicație web modernă!
 
 ### Latency Compensation
 
-<%= diagram "latency2", "With latency compensation", "pull-right" %>
+<%= diagram "latency2", "Cu latency compensation", "pull-right" %>
 
 ////
 
@@ -49,15 +49,15 @@ If this were the way Meteor operated, then there'd be a short lag between perfor
 Meteor.methods({
   post: function(postAttributes) {
     // […]
-    
+
     // pick out the whitelisted keys
     var post = _.extend(_.pick(postAttributes, 'url', 'message'), {
       title: postAttributes.title + (this.isSimulation ? '(client)' : '(server)'),
-      userId: user._id, 
-      author: user.username, 
+      userId: user._id,
+      author: user.username,
       submitted: new Date().getTime()
     });
-    
+
     // wait for 5 seconds
     if (! this.isSimulation) {
       var Future = Npm.require('fibers/future');
@@ -67,9 +67,9 @@ Meteor.methods({
       }, 5 * 1000);
       future.wait();
     }
-    
+
     var postId = Posts.insert(post);
-    
+
     return postId;
   }
 });
@@ -87,13 +87,13 @@ Meteor.methods({
 Template.postSubmit.events({
   'submit form': function(event) {
     event.preventDefault();
-    
+
     var post = {
       url: $(event.target).find('[name=url]').val(),
       title: $(event.target).find('[name=title]').val(),
       message: $(event.target).find('[name=message]').val()
     }
-    
+
     Meteor.call('post', post, function(error, id) {
       if (error)
         return alert(error.reason);
@@ -123,11 +123,11 @@ Template.postSubmit.events({
 
 1. ////
 2. ////
-  
+
 ### Methods Calling Methods
 
 ////
- 
+
 ////
 
 ////
