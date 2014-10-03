@@ -26,7 +26,7 @@ Dacă asta ar fi fost modul în care Meteor operează, atunci ar fi o întârzie
 
 <%= diagram "latency2", "Cu latency compensation", "pull-right" %>
 
-////
+Pentru a evita această problemă, Meteor introduce un concept numit **Latency Compensation** (compensarea pentru latență). Când am definit metoda de `post`, an plasat-o într-un fișier din folderul `collections/`. Asta înseamnă că este disponibilă atât pe server *cât și pe client* -- și că va rula pe amândouă în același timp!
 
 ////
 
