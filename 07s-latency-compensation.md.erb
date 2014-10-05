@@ -28,16 +28,16 @@ Dacă asta ar fi fost modul în care Meteor operează, atunci ar fi o întârzie
 
 Pentru a evita această problemă, Meteor introduce un concept numit **Latency Compensation** (compensarea pentru latență). Când am definit metoda de `post`, an plasat-o într-un fișier din folderul `collections/`. Asta înseamnă că este disponibilă atât pe server *cât și pe client* -- și că va rula pe amândouă în același timp!
 
-////
+Când apelezi o metodă Meteor, clientul trimite apelul spre server, dar simultan *simulează* acțiunea metodei pe colecțiile din client. Așa că workflow-ul nostru devine:
 
-- *+0ms:* ////
-- *+0ms:* ////
-- *+200ms:* ////
-- *+500ms:* ////
+- *+0ms:* Clientul apasă pe butonul de submit și browserul apelează metoda Meteor.
+- *+0ms:* Clientul simulează rezultatul apelării metodei pe colecțiile din client și schimbă interfața ca să reflecte asta.
+- *+200ms:* Serverul schimbă datele din baza de date Mongo.
+- *+500ms:* Clientul primește toate schimbările de la server, și schimbă interfața daca este necesar (de regulă nu este).
 
-////
+Rezultatul este că utilizatorul vede schimbările instant. Când răspunsul serverului vine câteva momente mai târziu, e posibil să fie sau să nu fie schimbări observabile între documentele canonice de pe server și cele de pe client. De reținut că ar trebui să simulăm documentele reale pe cât posibil.
 
-### Observing Latency Compensation
+### Observarea Latency Compensation
 
 ////
 
